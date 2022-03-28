@@ -1,0 +1,48 @@
+{{- if .Values.image-pull-test.enabled }}
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: {{ include "gke-node-startup.fullname" . }}-image-pull-test
+  labels:
+    app: image-pull-test
+spec:
+  selector:
+    matchLabels:
+      app: image-pull-test
+  template:
+    metadata:
+      labels:
+        app: image-pull-test
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "gke-node-startup.serviceAccountName" . }}
+      hostPID: true
+      containers:
+        - name: {{ .Chart.Name }}-image-pull-test
+          image: "{{ .Values.image-pull-test.image }}"
+          imagePullPolicy: Always
+
+
+          args:
+            - /bin/sh
+            - -c
+            - sleep 36000
+
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

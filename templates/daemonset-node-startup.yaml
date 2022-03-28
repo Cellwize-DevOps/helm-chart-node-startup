@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: {{ include "gke-node-startup.fullname" . }}
+  labels:
+    {{- include "gke-node-startup.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "gke-node-startup.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "gke-node-startup.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "gke-node-startup.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      hostPID: true
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+
+
+          args:
+            - /bin/sh
+            - -c
+            - /tmp/script/script.sh
+
+          volumeMounts:
+            - mountPath: /tmp/tmproot
+              name: root
+
+            - mountPath: /tmp/etc
+              name: profile
+
+            - mountPath: /tmp/script
+              name: node-startup-script
+
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: profile
+          hostPath:
+            path: /etc
+            type: Directory
+
+        - name: root
+          hostPath:
+            path: /
+            type: Directory
+
+        - name: node-startup-script
+          configMap:
+            name: node-startup-script
+            defaultMode: 0755

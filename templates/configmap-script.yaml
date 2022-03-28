@@ -1,0 +1,52 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: node-startup-script
+data:
+  script.sh: |
+    #! /bin/bash
+    PROFILE_DIR=/tmp/etc/profile
+    DOCKER_ENV_DIR=/tmp/etc/default/docker
+    PROXY_URL={{ .Values.proxy.method }}://{{ .Values.proxy.host }}:{{ .Values.proxy.port }}/
+    PROXY_NO_PROXY={{ .Values.proxy.no_proxy }}
+    DIR=""
+
+    function proxy_conf () {
+      echo "Updating proxy conf ->  $DIR"
+
+      cat <<EOF >> ${DIR}
+      http_proxy="$PROXY_URL"
+      https_proxy="$PROXY_URL"
+      HTTP_PROXY="$PROXY_URL"
+      HTTPS_PROXY="$PROXY_URL"
+      no_proxy=${PROXY_NO_PROXY}
+      NO_PROXY=${PROXY_NO_PROXY}
+    }
+
+    EXIST=$(cat ${PROFILE_DIR} | grep HTTP_PROXY | wc -l)
+    if [[ "${EXIST}" == "0" ]]; then
+      export DIR=$PROFILE_DIR
+      proxy_conf
+    fi
+
+    EXIST=$(cat ${DOCKER_ENV_DIR} | grep HTTP_PROXY | wc -l)
+    if [[ "${EXIST}" == "0" ]]; then
+      export DIR=$DOCKER_ENV_DIR
+      proxy_conf
+    fi
+
+    # Fetch Metadata
+    CLUSTER_NAME="$(curl -sS http://metadata/computeMetadata/v1/instance/attributes/cluster-name -H "Metadata-Flavor: Google")"
+    NODE_NAME="$(curl -sS http://metadata.google.internal/computeMetadata/v1/instance/hostname -H 'Metadata-Flavor: Google')"
+    FULL_ZONE="$(curl -sS http://metadata.google.internal/computeMetadata/v1/instance/zone -H 'Metadata-Flavor: Google' | awk -F  "/" '{print $4}')"
+    MAIN_ZONE="$(echo $FULL_ZONE | sed 's/\(.*\)-.*/\1/')"
+
+    echo "$NODE_NAME -> $FULL_ZONE in $CLUSTER_NAME"
+
+    # Restart docker daemon after proxy changes
+    chroot /tmp/tmproot /usr/bin/systemctl restart docker
+    chroot /tmp/tmproot /usr/bin/systemctl status docker | grep active
+    echo "Docker restarted"
+
+    # TODO FIXME - this pod should die right after executing. (No daemonSet job type yet implemented in k8s therefore we use a regular damonset for now)
+    sleep 36000000000
