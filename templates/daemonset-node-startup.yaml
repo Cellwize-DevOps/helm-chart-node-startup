@@ -22,8 +22,6 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "gke-node-startup.serviceAccountName" . }}
-      securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       hostPID: true
       containers:
         - name: {{ .Chart.Name }}
@@ -48,8 +46,6 @@ spec:
             - mountPath: /tmp/script
               name: node-startup-script
 
-          resources:
-            {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
