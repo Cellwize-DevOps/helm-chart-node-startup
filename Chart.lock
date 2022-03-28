@@ -1,0 +1,6 @@
+dependencies:
+- name: node-startup
+  repository: file://./custom-charts/node-startup
+  version: 0.1.0
+digest: sha256:14957ca3a171d6c16616984df336412ae59b78bde3051cfba8cfb50f6bc3eede
+generated: "2022-03-28T18:08:06.9916+03:00"
