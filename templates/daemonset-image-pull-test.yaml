@@ -1,4 +1,4 @@
-{{- if .Values.image-pull-test.enabled }}
+{{- if .Values.imagePullTest.enabled }}
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
@@ -22,7 +22,7 @@ spec:
       hostPID: true
       containers:
         - name: {{ .Chart.Name }}-image-pull-test
-          image: "{{ .Values.image-pull-test.image }}"
+          image: "{{ .Values.imagePullTest.image }}"
           imagePullPolicy: Always
 
 

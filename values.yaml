@@ -10,7 +10,7 @@ proxy:
   # GKE Control plane IP should be added as well in order to bypass proxy
   no_proxy: "googleapis.com,.svc,localhost,127.0.0.1,metadata.google.internal."
 
-image-pull-test:
+imagePullTest:
   enabled: true
   image: nicolaka/netshoot:latest
 
