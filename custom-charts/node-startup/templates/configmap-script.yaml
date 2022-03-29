@@ -47,6 +47,3 @@ data:
     chroot /tmp/tmproot /usr/bin/systemctl restart docker
     chroot /tmp/tmproot /usr/bin/systemctl status docker | grep active
     echo "Docker restarted"
-
-    # TODO FIXME - this pod should die right after executing. (No daemonSet job type yet implemented in k8s therefore we use a regular damonset for now)
-    sleep 36000000000
