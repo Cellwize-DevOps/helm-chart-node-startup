@@ -20,7 +20,7 @@ spec:
       {{- end }}
       serviceAccountName: {{ include "gke-node-startup.serviceAccountName" . }}
       hostPID: true
-      initContainer:
+      initContainers:
         - name: {{ .Chart.Name }}-image-pull-test
           image: "{{ .Values.imagePullTest.image }}"
           imagePullPolicy: Always
