@@ -6,7 +6,7 @@ proxy:
   method: "http"
   # Its recommended to provide an up rather than a DNS name due to dns issues that might arise when configuring a proxy.
   host: "10.10.10.10"
-  port: "8080"
+  port: "80"
   # GKE Control plane IP should be added as well in order to bypass proxy
   no_proxy: "googleapis.com,.svc,localhost,127.0.0.1,metadata.google.internal."
 
