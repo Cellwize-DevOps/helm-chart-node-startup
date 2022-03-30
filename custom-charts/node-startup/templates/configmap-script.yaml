@@ -24,17 +24,15 @@ data:
     EOF
     }
 
-    EXIST=$(cat ${PROFILE_DIR} | grep HTTP_PROXY | wc -l)
-    if [[ "${EXIST}" == "0" ]]; then
-      export DIR=$PROFILE_DIR
+    for f in ${PROFILE_DIR} ${DOCKER_ENV_DIR};
+    do
+      export DIR=$f
+      sed -i '/http_proxy\|https_proxy\|no_proxy\|NO_PROXY/d' $f
       proxy_conf
-    fi
-
-    EXIST=$(cat ${DOCKER_ENV_DIR} | grep HTTP_PROXY | wc -l)
-    if [[ "${EXIST}" == "0" ]]; then
-      export DIR=$DOCKER_ENV_DIR
-      proxy_conf
-    fi
+    
+      echo "----------- ${f} -----------------"
+      cat $f
+    done
 
     # Fetch Metadata
     CLUSTER_NAME="$(curl -sS http://metadata/computeMetadata/v1/instance/attributes/cluster-name -H "Metadata-Flavor: Google")"
