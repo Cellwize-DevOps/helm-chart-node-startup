@@ -21,6 +21,7 @@ data:
       HTTPS_PROXY="$PROXY_URL"
       no_proxy=${PROXY_NO_PROXY}
       NO_PROXY=${PROXY_NO_PROXY}
+    EOF
     }
 
     EXIST=$(cat ${PROFILE_DIR} | grep HTTP_PROXY | wc -l)
