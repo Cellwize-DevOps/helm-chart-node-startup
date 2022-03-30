@@ -15,19 +15,19 @@ data:
       echo "Updating proxy conf ->  $DIR"
 
       cat <<EOF >> ${DIR}
-      http_proxy="$PROXY_URL"
-      https_proxy="$PROXY_URL"
-      HTTP_PROXY="$PROXY_URL"
-      HTTPS_PROXY="$PROXY_URL"
-      no_proxy=${PROXY_NO_PROXY}
-      NO_PROXY=${PROXY_NO_PROXY}
+    http_proxy="$PROXY_URL"
+    https_proxy="$PROXY_URL"
+    HTTP_PROXY="$PROXY_URL"
+    HTTPS_PROXY="$PROXY_URL"
+    no_proxy=${PROXY_NO_PROXY}
+    NO_PROXY=${PROXY_NO_PROXY}
     EOF
     }
 
     for f in ${PROFILE_DIR} ${DOCKER_ENV_DIR};
     do
       export DIR=$f
-      sed -i '/http_proxy\|https_proxy\|HTTP_PROXY\|HTTPS_PROXYdv\|no_proxy\|NO_PROXY/d' $f
+      sed -i '/http_proxy\|https_proxy\|HTTP_PROXY\|HTTPS_PROXY\|no_proxy\|NO_PROXY/d' $f
       proxy_conf
     
       echo "----------- ${f} -----------------"
