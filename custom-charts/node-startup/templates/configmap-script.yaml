@@ -27,7 +27,7 @@ data:
     for f in ${PROFILE_DIR} ${DOCKER_ENV_DIR};
     do
       export DIR=$f
-      sed -i '/http_proxy\|https_proxy\|no_proxy\|NO_PROXY/d' $f
+      sed -i '/http_proxy\|https_proxy\|HTTP_PROXY\|HTTPS_PROXYdv\|no_proxy\|NO_PROXY/d' $f
       proxy_conf
     
       echo "----------- ${f} -----------------"
