@@ -20,7 +20,7 @@ spec:
       {{- end }}
       serviceAccountName: {{ include "gke-node-startup.serviceAccountName" . }}
       hostPID: true
-      containers:
+      initContainer:
         - name: {{ .Chart.Name }}-image-pull-test
           image: "{{ .Values.imagePullTest.image }}"
           imagePullPolicy: Always
@@ -29,7 +29,17 @@ spec:
           args:
             - /bin/sh
             - -c
-            - sleep 36000
+            - date
+      containers:
+        - name: pause
+          image: gcr.io/google_containers/pause
+          resources:
+            limits:
+              cpu: 50m
+              memory: 50Mi
+            requests:
+              cpu: 50m
+              memory: 50Mi
 
       {{- with .Values.nodeSelector }}
       nodeSelector:
